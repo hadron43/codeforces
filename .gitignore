@@ -1,4 +1,4 @@
 *
 !archives
-!*.json
+!**.json
 *.txt
