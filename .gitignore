@@ -1,4 +1,8 @@
-*
-!archives
-!**.json
-*.txt
+A
+B
+C
+D
+E
+F
+/*.txt
+/*.cpp
