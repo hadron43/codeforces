@@ -9,60 +9,97 @@ using namespace std;
 #define maxsize 200000
 typedef long long ll;
 
-struct entry {
+class entry {
+    public:
     int index;
     int w, h;
+
+    entry(int index, int a, int b) {
+        this->index = index;
+        if(a > b) {
+            h = a;
+            w = b;
+        }
+        else {
+            h = b;
+            w = a;
+        }
+    }
+
+    bool operator < (entry &e) {
+        if(h < e.h)
+            return true;
+        return false;
+    }
+
+    bool operator == (entry &e) {
+        if(h == e.h)
+            return true;
+        return false;
+    }
+
+    bool operator %(entry &e) {
+        if(w < e.w)
+            return true;
+        return false;
+    }
 };
 
-bool compare(const entry &a, const entry &b) {
-    if((a.w<b.w && a.h<b.h) || (a.w<b.h && a.h<b.w))
-        return true;
-    return false;
-}
-
 vector<entry> arr;
-int ans[maxsize];
+vector<int> ans, pre, m;
 int T, N, in1, in2;
-
-int binarySearch(int low, int high, entry &en) {
-    if(low > high)
-        return -1;
-    
-    int mid = (low + high) / 2;
-
-    if(compare(arr[mid], en)) {
-        return arr[mid].index;
-    }
-    else {
-        return binarySearch(low, mid-1, en);
-    }
-}
 
 void solve() {
     arr.clear();
-    entry en;
+    pre.clear();
+    m.clear();
+    ans.clear();
 
     for(int i=0; i<N; ++i) {
-        en.index = i+1;
         cin>>in1>>in2;
-        en.w = in1;
-        en.h = in2;
-
-        arr.push_back(en);
+        arr.push_back(entry(i+1, in1, in2));
     }
 
-    sort(arr.begin(), arr.end(), compare);
-    memset(ans, 0, N*sizeof(int));
-
-    for(entry i : arr) {
-        // cout<<i.index<<": "<<i.h<<", "<<i.w<<endl;
-        int result = binarySearch(0, arr.size()-1, i);
-        ans[i.index-1] = result;
+    sort(arr.begin(), arr.end());
+    pre.resize(N);
+    pre[0] = -1;
+    for(int i=1; i<N; ++i) {
+        if(arr[i] == arr[i-1])
+            pre[i] = pre[i-1];
+        else
+            pre[i] = i-1;
     }
 
+    m.resize(N);
+    m[0] = 0;
+    for(int i=1; i<N; ++i) {
+        if(arr[m[i-1]] % arr[i]) {
+            m[i] = m[i-1];
+        }
+        else {
+            m[i] = i;
+        }
+    }
+
+    ans.resize(N);
     for(int i=0; i<N; ++i) {
-        cout<<ans[i]<<" ";
+        ans[i] = -1;
+        if(pre[i] < 0) {
+            continue;
+        }
+        int pos = m[pre[i]];
+        if(arr[pos] % arr[i]) {
+            ans[i] = arr[pos].index;
+        }
     }
+
+    vector<int> res(N);
+    for(int i=0; i<N; ++i) {
+        res[arr[i].index-1] = ans[i];
+    }
+
+    for(int x : res)
+        cout<<x<<" ";
     cout<<endl;
 }
 
